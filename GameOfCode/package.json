@@ -1,7 +1,8 @@
 {
-    "name": "GameOfCode",
-    "version": "1.0.0",
-    "private": true,
-    "dependencies": {
-    }
+  "name": "GameOfCode",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "cordova": "^6.1.1"
+  }
 }
