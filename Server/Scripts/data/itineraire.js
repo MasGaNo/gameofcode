@@ -19,19 +19,34 @@ function isInclude(collection, key) {
 }
 function populatePositionsWithWaypoints(waypoints, uid, time) {
     var result = true;
-    _(waypoints).each(function (waypoint, index) {
-        var positionKey = waypoint.position.from.lng + "_" + waypoint.position.from.lat + "__" + waypoint.position.to.lat + "_" + waypoint.position.to.lng;
+    /*_(waypoints).each(function (waypoint, index) {
+        var positionKey = `${waypoint.position.from.lng}_${waypoint.position.from.lat}__${waypoint.position.to.lat}_${waypoint.position.to.lng}`;
+
         if (isInclude(Positions, positionKey) !== false) {
             result = positionKey;
             return false;
-        }
-        else {
+        } else {
             Positions[positionKey] = [{
-                    uid: uid,
-                    time: time
-                }];
+                uid: uid,
+                time: time
+            }];
         }
-    });
+    });*/
+    var itineraireHash = waypoints.map(function (waypoint, index) {
+        if (!index) {
+            return waypoint.position.from.lng + "_" + waypoint.position.from.lat + "__" + waypoint.position.to.lat + "_" + waypoint.position.to.lng;
+        }
+        return waypoint.position.to.lat + "_" + waypoint.position.to.lng;
+    }).join('__');
+    if (isInclude(Positions, itineraireHash) !== false) {
+        return false;
+    }
+    else {
+        Positions[itineraireHash] = [{
+                uid: uid,
+                time: time
+            }];
+    }
     return result;
 }
 function formatSteps(steps) {
@@ -58,27 +73,34 @@ function directionApi(params, options) {
                 });
             }
             else {
-                console.log(data);
                 if (data.status === 'ZERO_RESULTS') {
                     return resolve({ status: 'empty' });
                 }
-                var steps = formatSteps(data.routes[0].legs[0].steps);
-                if (isNullOrUndefined(steps)) {
-                    return reject({
-                        message: "No route found for this trajet."
-                    });
-                }
-                console.log(steps);
-                var dontNeedToRecalculate = populatePositionsWithWaypoints(steps, options.uid, params.departure_time);
-                if (dontNeedToRecalculate !== true) {
-                    if (options.isAlternatives) {
-                        return resolve(steps);
+                for (var i = 0, max = data.routes.length; i < max; ++i) {
+                    var steps = formatSteps(data.routes[i].legs[0].steps);
+                    if (isNullOrUndefined(steps)) {
+                        return reject({
+                            message: "No route found for this trajet."
+                        });
                     }
-                    params.alternatives = true;
-                    options.isAlternatives = true;
-                    return directionApi(params, options).then(resolve, reject);
+                    var dontNeedToRecalculate = populatePositionsWithWaypoints(steps, options.uid, params.departure_time);
+                    if (dontNeedToRecalculate === true) {
+                        return resolve({
+                            infos: {
+                                bounds: data.routes[i].bounds,
+                                distance: data.routes[i].legs[0].distance.value,
+                                duration: data.routes[i].legs[0].duration.value
+                            },
+                            steps: steps
+                        });
+                    }
                 }
-                resolve(steps);
+                if (options.isAlternatives) {
+                    return resolve(steps);
+                }
+                params.alternatives = true;
+                options.isAlternatives = true;
+                directionApi(params, options).then(resolve, reject);
             }
         });
     });

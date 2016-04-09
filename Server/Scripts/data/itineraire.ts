@@ -28,9 +28,42 @@ interface IGoogleWaypoints {
     types: any;
 }
 
+interface IGoogleBounds {
+    northeast: IPosition;
+    southwest: IPosition;
+}
+
+interface IGoogleLeg {
+    distance: {
+        text: string;
+        value: number;
+    };
+    duration: {
+        text: string;
+        value: number;
+    };
+    end_address: string;
+    end_location: IPosition;
+    start_address: string;
+    steps: IGoogleStep[];
+    via_waypoint: any[];
+}
+
+interface IGoogleRoute {
+    bounds: IGoogleBounds;
+    copyrights: string;
+    legs: IGoogleLeg[];
+    overview_polyline: {
+        points: string;
+    };
+    summary: string;
+    warnings: any[];
+    waypoint_order: any[];
+}
+
 interface IGoogleResponse {
     geocoded_waypoints: IGoogleWaypoints[];
-    routes: any[];
+    routes: IGoogleRoute[];
     status: string;
 }
 
@@ -63,18 +96,37 @@ interface IRealStep {
     mode: string;
 }
 
+interface IRealRoute {
+    steps: IRealStep[];
+    infos: {
+        bounds: {
+            northeast: IPosition;
+            southwest: IPosition;
+        };
+        distance: number;
+        duration: number;
+    }
+}
+
 
 interface IUserPoint {
     uid: string;
     time: Date;
 }
 
-interface IGoogleParams {
-    origin: string;
-    destination: string;
-    mode: string;
-    departure_time: number;
-    alternatives?: boolean;
+interface IGoogleDirectionParams {
+    "origin": string;
+    "destination": string;
+    "mode": string;
+    "waypoints"?: string;
+    "alternatives"?: boolean;
+    "avoid"?: string;
+    "language"?: string;
+    "region"?: string;
+    "units"?: string;
+    "departure_time"?: number;
+    "arrival_time"?: number;
+    "traffic_model"?: string;
 }
 
 interface IDirectionApiOptions {
@@ -95,7 +147,7 @@ function isInclude(collection, key) {
 
 function populatePositionsWithWaypoints(waypoints: IRealStep[], uid, time) {
     var result: any = true;
-    _(waypoints).each(function (waypoint, index) {
+    /*_(waypoints).each(function (waypoint, index) {
         var positionKey = `${waypoint.position.from.lng}_${waypoint.position.from.lat}__${waypoint.position.to.lat}_${waypoint.position.to.lng}`;
 
         if (isInclude(Positions, positionKey) !== false) {
@@ -107,7 +159,23 @@ function populatePositionsWithWaypoints(waypoints: IRealStep[], uid, time) {
                 time: time
             }];
         }
-    });
+    });*/
+    let itineraireHash = waypoints.map((waypoint, index) => {
+        if (!index) {
+            return `${waypoint.position.from.lng}_${waypoint.position.from.lat}__${waypoint.position.to.lat}_${waypoint.position.to.lng}`;
+        }
+        return `${waypoint.position.to.lat}_${waypoint.position.to.lng}`;
+    }).join('__');
+
+    if (isInclude(Positions, itineraireHash) !== false) {
+        return false;
+    } else {
+        Positions[itineraireHash] = [{
+            uid: uid,
+            time: time
+        }];
+    }
+
     return result;
 }
 
@@ -126,7 +194,7 @@ function formatSteps(steps: IGoogleStep[]): IRealStep[] {
     });
 }
 
-function directionApi(params: IGoogleParams, options: IDirectionApiOptions) {
+function directionApi(params: IGoogleDirectionParams, options: IDirectionApiOptions) {
 
     return new Promise((resolve, reject) => {
 
@@ -138,35 +206,40 @@ function directionApi(params: IGoogleParams, options: IDirectionApiOptions) {
                 });
             } else {
 
-                console.log(data);
-
                 if (data.status === 'ZERO_RESULTS') {
                     return resolve({ status: 'empty' });
                 }
 
-                var steps = formatSteps(data.routes[0].legs[0].steps);
+                for (var i = 0, max = data.routes.length; i < max; ++i) {
+                    var steps = formatSteps(data.routes[i].legs[0].steps);
 
-                if (isNullOrUndefined(steps)) {
-                    return reject({
-                        message: "No route found for this trajet."
-                    });
-                }
-
-                console.log(steps);
-                var dontNeedToRecalculate = populatePositionsWithWaypoints(steps, options.uid, params.departure_time)
-
-                if (dontNeedToRecalculate !== true) {
-
-                    if (options.isAlternatives) {
-                        return resolve(steps);
+                    if (isNullOrUndefined(steps)) {
+                        return reject({
+                            message: "No route found for this trajet."
+                        });
                     }
 
-                    params.alternatives = true;
-                    options.isAlternatives = true;
-                    return directionApi(params, options).then(resolve, reject);
+                    var dontNeedToRecalculate = populatePositionsWithWaypoints(steps, options.uid, params.departure_time);
+
+                    if (dontNeedToRecalculate === true) {
+                        return resolve(<IRealRoute>{
+                            infos: {
+                                bounds: data.routes[i].bounds,
+                                distance: data.routes[i].legs[0].distance.value,
+                                duration: data.routes[i].legs[0].duration.value
+                            },
+                            steps: steps
+                        });
+                    }
                 }
 
-                resolve(steps);
+                if (options.isAlternatives) {
+                    return resolve(steps);
+                }
+
+                params.alternatives = true;
+                options.isAlternatives = true;
+                directionApi(params, options).then(resolve, reject);
             }
         })
     });
@@ -184,7 +257,7 @@ export function getBestItineraire(req, res: Express.Response) {
     }
 
     // Call Google Api
-    var params: IGoogleParams = {
+    var params: IGoogleDirectionParams = {
         origin: `${position.from.lng},${position.from.lat}`,
         destination: `${position.to.lng},${position.to.lat}`,
         mode: 'driving',
