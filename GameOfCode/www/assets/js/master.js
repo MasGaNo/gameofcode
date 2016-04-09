@@ -141,7 +141,7 @@ $(document).ready(function(){
             console.error(data);``
         alert('Error... please try again later...');
     }).always(() => {
-            $button.prop('disabled', false);
+          $button.prop('disabled', false);
         $loader.removeClass('active');
     });
     });
