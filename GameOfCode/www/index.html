@@ -24,7 +24,7 @@
                     <form role="form" id="calculateID">
                         <div class="form-group has-feedback has-feedback-left">
                             <i class="form-control-feedback glyphicon glyphicon-map-marker" ></i>
-                            <input type="text" id="start" class="form-control" placeholder="My Position" onFocus="geolocate()" name="from"  value="My Position" required="true">
+                            <input type="text" id="start" class="form-control" placeholder="My Position" onFocus="geolocate()" name="from">
                         </div>
                         <div class="form-group has-feedback has-feedback-left">
                             <i class="form-control-feedback glyphicon glyphicon-flag" ></i>
@@ -50,6 +50,7 @@
                         <div class="form-group  ">
                             <button class="btn btn-block btn-block" type="submit" >
                                 <strong><span class="glyphicon glyphicon-search"></span> Search</strong></button>
+                            <span class="loader"><img src="assets/img/loader.gif" alt="loader"/></span>
                         </div>
 
                     </form>

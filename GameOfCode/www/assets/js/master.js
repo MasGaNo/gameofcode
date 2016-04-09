@@ -36,6 +36,8 @@ function initAutocomplete() {
     // fields in the form.
     autocomplete.addListener('place_changed', fillInAddress.bind(autocomplete, $start));
     autocompleteb.addListener('place_changed', fillInAddress.bind(autocompleteb, $end));
+
+    geolocate();
 }
 
 function fillInAddress($formInput) {
@@ -55,11 +57,11 @@ function geolocate() {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             };
-            var circle = new google.maps.Circle({
+            /*var circle = new google.maps.Circle({
                 center: geolocation,
                 radius: position.coords.accuracy
             });
-            autocomplete.setBounds(circle.getBounds());
+            autocomplete.setBounds(circle.getBounds());*/
         });
     }
 }
@@ -79,8 +81,8 @@ $(document).ready(function(){
             };
         });
 
-        data.position.from['lat'] = data.position.from['lat'] || '6.113629';
-        data.position.from['lng'] = data.position.from['lng'] || '49.600508';
+        data.position.from['lat'] = data.position.from['lat'] || 6.113629;
+        data.position.from['lng'] = data.position.from['lng'] || 49.600508;
 
         data.uid = 'j3h4jk23b';
 
@@ -93,23 +95,31 @@ $(document).ready(function(){
             if (dataForm.name in data) {
                 if (!(data[dataForm.name] instanceof Array)) {
                     data[dataForm.name] = [data[dataForm.name]];
-                } else {
-                    data[dataForm.name].push(dataForm.value);
                 }
+                data[dataForm.name].push(dataForm.value);
             } else {
                 data[dataForm.name] = dataForm.value;
             }
         });
 
-
         var localUrl = GameOfCode.Configuration.Server.url + "/trafficPlanner";
 
-
+        var $button = $form.find('button[type=submit]');
+        var $loader = $button.next('.loader');
+        $button.prop('disabled', true);
+        $loader.addClass('active');
 
         $.ajax({
             type: "POST",
             url: localUrl,
             data: data
+        }).complete((data) => {
+
+        }).fail((data) => {
+            alert('Error... please try again later...');
+        }).always(() => {
+            $button.prop('disabled', false);
+            $loader.removeClass('active');
         });
 
     });
