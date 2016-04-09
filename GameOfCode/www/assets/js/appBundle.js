@@ -109,6 +109,20 @@ var GameOfCode;
                     });
                 }
                 Maps.setItineraire = setItineraire;
+                function centerCameraTo(point) {
+                    if (mapInstance) {
+                        var target = new window.plugin.google.maps.LatLng(point.lat, point.lng);
+                        mapInstance.animateCamera({
+                            'target': target,
+                            'tilt': 60,
+                            'zoom': 18,
+                            'bearing': 140,
+                            'duration': 5000 // = 5 sec.
+                        }, function () {
+                        });
+                    }
+                }
+                Maps.centerCameraTo = centerCameraTo;
             })(Maps = Google.Maps || (Google.Maps = {}));
         })(Google = Maps_1.Google || (Maps_1.Google = {}));
     })(Maps = GameOfCode.Maps || (GameOfCode.Maps = {}));

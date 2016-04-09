@@ -147,8 +147,8 @@ $(document).ready(function(){
                     $('#pagetwo button').off('click').on('click', function() {
                       GameOfCode.Maps.Google.Maps.show();
                       GameOfCode.Maps.Google.Maps.clearInfo();
-                      GameOfCode.Maps.Google.Maps.activeTraffic();
                         GameOfCode.Maps.Google.Maps.setItineraire(polygineList);
+                        GameOfCode.Maps.Google.Maps.centerCameraTo(polygineList[0]);
 
                     });
                 }

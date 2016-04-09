@@ -70,6 +70,22 @@
                       });
                 }
 
+                export function centerCameraTo(point) {
+
+                  if (mapInstance) {
+                      let target = new (window as any).plugin.google.maps.LatLng(point.lat, point.lng);
+                      mapInstance.animateCamera({
+                          'target': target,
+                          'tilt': 60,
+                          'zoom': 18,
+                          'bearing': 140,
+                          'duration': 5000 // = 5 sec.
+                      }, function() {
+                      });
+                  }
+
+                }
+
             }
         }
     }
