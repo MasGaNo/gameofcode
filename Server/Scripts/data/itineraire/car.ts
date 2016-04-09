@@ -29,7 +29,7 @@ function isNullOrUndefined(value) {
 function isInclude(collection, key) {
     return collection[key] || false
 }
-
+ 
 function populatePositionsWithWaypoints(waypoints: GameOfCode.RealApi.IRealStep[], uid, time) {
     var result: any = true;
     /*_(waypoints).each(function (waypoint, index) {
