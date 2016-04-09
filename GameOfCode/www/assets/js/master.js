@@ -22,37 +22,28 @@ var componentForm = {
 function initAutocomplete() {
     // Create the autocomplete object, restricting the search to geographical
     // location types.
+
+    var $start = $('#start');
+    var $end = $('#end')
     autocomplete = new google.maps.places.Autocomplete(
-        /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
+        /** @type {!HTMLInputElement} */($start[0]),
         {types: ['geocode']});
     autocompleteb = new google.maps.places.Autocomplete(
-        /** @type {!HTMLInputElement} */(document.getElementById('autocompleteb')),
+        /** @type {!HTMLInputElement} */($end[0]),
         {types: ['geocode']});
 
     // When the user selects an address from the dropdown, populate the address
     // fields in the form.
-    autocomplete.addListener('place_changed', fillInAddress);
-    autocompleteb.addListener('place_changed', fillInAddress);
+    autocomplete.addListener('place_changed', fillInAddress.bind(autocomplete, $start));
+    autocompleteb.addListener('place_changed', fillInAddress.bind(autocompleteb, $end));
 }
 
-function fillInAddress() {
+function fillInAddress($formInput) {
     // Get the place details from the autocomplete object.
-    var place = autocomplete.getPlace();
+    var place = this.getPlace();
 
-    for (var component in componentForm) {
-        document.getElementById(component).value = '';
-        document.getElementById(component).disabled = false;
-    }
-
-    // Get each component of the address from the place details
-    // and fill the corresponding field on the form.
-    for (var i = 0; i < place.address_components.length; i++) {
-        var addressType = place.address_components[i].types[0];
-        if (componentForm[addressType]) {
-            var val = place.address_components[i][componentForm[addressType]];
-            document.getElementById(addressType).value = val;
-        }
-    }
+    $formInput.data('lng', place.geometry.location.lng());
+    $formInput.data('lat', place.geometry.location.lat());
 }
 
 // Bias the autocomplete object to the user's geographical location,
@@ -73,13 +64,29 @@ function geolocate() {
     }
 }
 
+$(document).ready(function(){
+    $('#calculateID').on('submit', function(e) {
 
-//Initiating Map
+        e.preventDefault();
 
-var map;
-function initMap() {
-    map = new google.maps.Map(document.getElementById('mapLocation'), {
-        center: {lat: -34.397, lng: 150.644},
-        zoom: 8
+        var $form = $(e.currentTarget);
+        var data = {};
+        $form.find('input').each((index, input) => {
+            var $input = $(input);
+            data[$input.attr('name')] = {
+                lng: $input.data('lng'),
+                lat: $input.data('lat')
+            };
+        });
+        //location.href = "http://localhost:63342" + "?from=&to=" + data.geometry.location;
+        var serializeData = $form.serializeArray();
+        console.log(data);
     });
-}
+});
+
+
+
+
+
+
+
