@@ -1,4 +1,5 @@
 /// <reference path="../typings/gameofcode/gameofcode.d.ts" />
+"use strict";
 var ItineraireCar = require('./itineraire/car');
 function getBestItineraire(req, res) {
     var options = req.body;

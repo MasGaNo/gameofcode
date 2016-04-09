@@ -74,20 +74,37 @@ $(document).ready(function(){
         $form.find('input[name=from], input[name=to]').each((index, input) => {
             var $input = $(input);
             data['position'][$input.attr('name')] = {
-                lng: $input.data('lng'),
-                lat: $input.data('lat')
+                lng: $input.data('lat'),
+                lat: $input.data('lng')
             };
         });
 
-        var serializeData = $form.serializeArray();
-
-        data.position.from['lat'] = data.position.from['lat'] || '49.600508';
-        data.position.from['lng'] = data.position.from['lng'] || '6.113629';
+        data.position.from['lat'] = data.position.from['lat'] || '6.113629';
+        data.position.from['lng'] = data.position.from['lng'] || '49.600508';
 
         data.uid = 'j3h4jk23b';
 
+        var serializeData = $form.serializeArray();
+        serializeData.forEach((dataForm) => {
+            if (dataForm.name === 'from' || dataForm.name === 'to') {
+                return;
+            }
+
+            if (dataForm.name in data) {
+                if (!(data[dataForm.name] instanceof Array)) {
+                    data[dataForm.name] = [data[dataForm.name]];
+                } else {
+                    data[dataForm.name].push(dataForm.value);
+                }
+            } else {
+                data[dataForm.name] = dataForm.value;
+            }
+        });
+
+
         var localUrl = GameOfCode.Configuration.Server.url + "/trafficPlanner";
-        //window.location.assign($url);
+
+
 
         $.ajax({
             type: "POST",
