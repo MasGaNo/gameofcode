@@ -1,14 +1,7 @@
-var express = require('express');
-var app = express();
-
-app.get('/', function (req, res) {
-	res.send('Hello World!');
-});
-
-app.post('/trafficPlanner', function(req, res) {
-	res.send(req.body);
-});
-
-app.listen(3000, function () {
-	console.log('The Mobiliteit Server is running.');
-});
+var http = require('http');
+var port = process.env.port || 1337;
+http.createServer(function (req, res) {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Hello World\n');
+}).listen(port);
+//# sourceMappingURL=server.js.map
