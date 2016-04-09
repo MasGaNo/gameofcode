@@ -11,7 +11,7 @@ import Express = require('express');
 declare var Promise: any;
 
 var publicConfig = {
-    key: 'AIzaSyDE5v5BvgE7zpYBHlH5g9_HlqAPgXXsHpQ',
+    key: 'THE_API_KEY',
     stagger_time: 1000,
     encode_polylines: false,
     secure: true
