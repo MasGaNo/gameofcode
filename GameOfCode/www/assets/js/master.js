@@ -78,9 +78,24 @@ $(document).ready(function(){
                 lat: $input.data('lat')
             };
         });
-        //location.href = "http://localhost:63342" + "?from=&to=" + data.geometry.location;
+
         var serializeData = $form.serializeArray();
-        console.log(data);
+        $to =  Object.keys(data.to).map(function(_) { return data.to[_]; });
+
+        data.from['lat'] = data.from['lat'] || '49.600508';
+        data.from['lng'] = data.from['lng'] || '6.113629';
+
+        data.uid = 'j3h4jk23b';
+
+        var localUrl = GameOfCode.Configuration.Server.url + "/trafficPlanner";
+        //window.location.assign($url);
+
+        $.ajax({
+            type: "POST",
+            url: localUrl,
+            data: data
+        });
+
     });
 });
 
