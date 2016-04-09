@@ -95,13 +95,14 @@ $(document).ready(function(){
             data: data
         }).success((data) => {
             var $response=$(data);
-                if(data.steps.length>0)
+            var steps = data.result.steps;
+                if(steps.length>0)
                 {
-                    var num = data.steps.length;
+                    var num = steps.length;
                     for(var i = 0; i < num; i++) {
-                        var $mode=data.steps[i]['mode'];
-                        var $distance=data.steps[i]['distance'];
-                        $duration=data.steps[i]['duration'];
+                        var $mode=steps[i]['mode'];
+                        var $distance=steps[i]['distance'];
+                        $duration=steps[i]['duration'];
                         $img="assets/img/map.png";
                         if($mode=="DRIVING")
                         {
@@ -121,7 +122,7 @@ $(document).ready(function(){
                         {
                             $img="assets/img/walk.png";
                         }
-                        var $desc=data.steps[i]['description'];
+                        var $desc=steps[i]['description'];
                         var $cart='<br><div class="clearfix"></div><div class="row-fluid">' +
                             '<div class="col-md-3 col-xs-3 col-sm-3"><img class="lock-img" src="'+$img+ '" /></div> ' +
                             '<div class="col-md-9 col-xs-3 col-sm-9"> ' +
