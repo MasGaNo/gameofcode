@@ -17,7 +17,6 @@ app.use(function(req, res, next) {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
 app.post('/trafficPlanner', routeDataItineraire.getBestItineraire);
 
 app.get('/addressSuggest', routeDataMapdata.addressToGeoloc);

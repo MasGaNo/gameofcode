@@ -6,8 +6,8 @@ var GameOfCode;
     var Configuration;
     (function (Configuration) {
         Configuration.Server = {
-            host: 'localhost',
-            port: 3000,
+            host: 'realmobiliteitserver.westeurope.cloudapp.azure.com',
+            port: 80,
             protocole: 'http'
         };
         Object.defineProperty(Configuration.Server, 'url', {
@@ -50,7 +50,7 @@ var GameOfCode;
             (function (Maps) {
                 var mapInstance = null;
                 function init(callback) {
-                    if (!window.plugin || !window.plugin.google || !!window.plugin.google.maps) {
+                    if (!window.plugin || !window.plugin.google || !window.plugin.google.maps) {
                         return;
                     }
                     window.plugin.google.maps.Map.isAvailable(function (isAvailable, message) {

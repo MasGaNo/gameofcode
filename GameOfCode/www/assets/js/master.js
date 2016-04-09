@@ -10,6 +10,7 @@
 // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
 
 var placeSearch, autocomplete, autocompleteb;
+
 var componentForm = {
     street_number: 'short_name',
     route: 'long_name',
@@ -34,22 +35,29 @@ function initAutocomplete() {
 
     // When the user selects an address from the dropdown, populate the address
     // fields in the form.
+
     autocomplete.addListener('place_changed', fillInAddress.bind(autocomplete, $start));
     autocompleteb.addListener('place_changed', fillInAddress.bind(autocompleteb, $end));
 
     geolocate();
 }
 
+
+
 function fillInAddress($formInput) {
     // Get the place details from the autocomplete object.
+
     var place = this.getPlace();
 
     $formInput.data('lng', place.geometry.location.lng());
     $formInput.data('lat', place.geometry.location.lat());
 }
 
+
+
 // Bias the autocomplete object to the user's geographical location,
 // as supplied by the browser's 'navigator.geolocation' object.
+
 function geolocate() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -61,14 +69,16 @@ function geolocate() {
                 center: geolocation,
                 radius: position.coords.accuracy
             });
+
             autocomplete.setBounds(circle.getBounds());*/
         });
     }
 }
 
+
+
 $(document).ready(function(){
     $('#calculateID').on('submit', function(e) {
-
         e.preventDefault();
 
         var $form = $(e.currentTarget);
@@ -115,6 +125,57 @@ $(document).ready(function(){
             data: data
         }).complete((data) => {
 
+	          var $response=$(data);
+​
+                if(data.steps.length>0)
+                {
+                    var num = data.steps.length;
+                    for(var i = 1; i <= num; i++) {
+                        var $mode=data.steps[i]['mode'];
+                        var $distance=data.steps[i]['distance'];
+                        $duration=data.steps[i]['duration'];
+​
+                        $img="assets/img/map.png";
+                        if($mode=="DRIVING")
+                        {
+                            $img="assets/img/car.png";
+                        }else if ($mode=="BUS")
+                        {
+                            $img="assets/img/bus.png";
+                        }else if($mode=="TRAIN")
+                        {
+                            $img="assets/img/train.png";
+                        }
+                        else if($mode=="BIKE")
+                        {
+                            $img="assets/img/bike.png";
+                        }
+                        else if ($mode=="WALK")
+                        {
+                            $img="assets/img/walk.png";
+                        }
+                        var $desc=data.steps[i]['description'];
+                        var $cart='<br><div class="clearfix"></div><div class="row-fluid">' +
+                            '<div class="col-md-3 col-xs-3 col-sm-3"><img class="lock-img" src="'+$img+ '" /></div> ' +
+                            '<div class="col-md-9 col-xs-3 col-sm-9"> ' +
+                            '<div class="card-block"> ' +
+                            '<div class="text-muted">Description</div> <p class="card-text">'+$desc+'</p> ' +
+                            '<ul class="list-inline text-muted"> ' +
+                            '<li class="list-inline-item"><i class="fa fa-flag"></i> '+$distance+'m</li> ' +
+                            '<li class="list-inline-item"><i class="fa fa-clock-o"></i> '+$duration+'s</li> ' +
+                            '</ul> ' +
+                            '</div></div> ' +
+                            '</div> ' +
+                            '';
+​
+                        $('#pagetwo').append($cart).hide().show('slow');
+                    }
+​
+                }
+
+				$('#pagetwo').show();
+        $('#pageone').hide();
+
         }).fail((data) => {
             console.error(data);``
             alert('Error... please try again later...');
@@ -122,13 +183,5 @@ $(document).ready(function(){
             $button.prop('disabled', false);
             $loader.removeClass('active');
         });
-
     });
 });
-
-
-
-
-
-
-

@@ -14,8 +14,8 @@ module GameOfCode {
 
         export var Server: IServerConfiguration = {
 
-            host: 'localhost',
-            port: 3000,
+            host: 'realmobiliteitserver.westeurope.cloudapp.azure.com',
+            port: 80,
             protocole: 'http'
 
         }
