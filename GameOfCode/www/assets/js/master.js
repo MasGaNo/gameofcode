@@ -5,19 +5,9 @@
 // This example displays an address form, using the autocomplete feature
 // of the Google Places API to help users fill in the information.
 
-// This example requires the Places library. Include the libraries=places
-// parameter when you first load the API. For example:
-// <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
 
-var placeSearch, autocomplete, autocompleteb;
-var componentForm = {
-    street_number: 'short_name',
-    route: 'long_name',
-    locality: 'long_name',
-    administrative_area_level_1: 'short_name',
-    country: 'long_name',
-    postal_code: 'short_name'
-};
+var autocomplete, autocompleteb, travelMode;
+
 
 function initAutocomplete() {
     // Create the autocomplete object, restricting the search to geographical
@@ -25,6 +15,9 @@ function initAutocomplete() {
 
     var $start = $('#start');
     var $end = $('#end')
+    var $mode = $('input:checked').map(function(){
+        return $(this).val();
+    });
     autocomplete = new google.maps.places.Autocomplete(
         /** @type {!HTMLInputElement} */($start[0]),
         {types: ['geocode']});
@@ -36,6 +29,8 @@ function initAutocomplete() {
     // fields in the form.
     autocomplete.addListener('place_changed', fillInAddress.bind(autocomplete, $start));
     autocompleteb.addListener('place_changed', fillInAddress.bind(autocompleteb, $end));
+    autocompleteb.addListener('place_changed', fillInAddress.bind(travelMode, $end));
+    console.log($mode);
 }
 
 function fillInAddress($formInput) {
@@ -87,7 +82,7 @@ $(document).ready(function(){
         data.uid = 'j3h4jk23b';
 
         var localUrl = GameOfCode.Configuration.Server.url + "/trafficPlanner";
-        //window.location.assign($url);
+
 
         $.ajax({
             type: "POST",
@@ -95,6 +90,8 @@ $(document).ready(function(){
             data: data
         });
 
+        $('#pagetwo').show();
+        $('#pageone').hide();
     });
 });
 
