@@ -1,4 +1,5 @@
-﻿///<reference path="./maps/google/maps.ts"/>
+﻿/// <reference path="./advSearch.ts"/>
+///<reference path="./maps/google/maps.ts"/>
 
 module GameOfCode {
     "use strict";
@@ -10,8 +11,9 @@ module GameOfCode {
             GameOfCode.Maps.Google.Maps.init(() => {
 
                 
+                GameOfCode.AdvSearch.start();
 
-            });
+                });
 
         }
 

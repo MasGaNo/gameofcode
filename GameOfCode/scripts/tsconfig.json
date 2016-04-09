@@ -5,7 +5,7 @@
         "removeComments": false,
         "sourceMap": true,
         "inlineSources": true,
-        "out": "www/scripts/appBundle.js",
+        "out": "../www/assets/js/appBundle.js",
         "target": "es5"
     }
 }
