@@ -12,7 +12,7 @@ var GameOfCode;
             $.get(GameOfCode.Configuration.Server.url + '/addressSuggest', {
                 dataType: 'json'
             }).then(function (data) {
-                console.log(JSON.parse(data));
+                console.log(data);
             }).fail(function (error) {
                 console.log(error);
             });
