@@ -51,6 +51,10 @@ p > img{
 }
 
 .lock-img{
-    width: 25px !important;;
+    width: 45px !important;;
+}
+.border-img{
+    border: solid 1px #C0C0C0 !important;
+    border-radius: 4px;
 }
 

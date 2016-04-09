@@ -122,7 +122,7 @@ $(document).ready(function(){
                             $img="assets/img/walk.png";
                         }
                         var $desc=data.steps[i]['description'];
-                        var $cart='<br></div><div class="row-fluid thumbnail">' +
+                        var $cart='<br></div><div class="row-fluid border-img">' +
                             '<div class="col-xs-2 col-sm-2"><img class="lock-img" src="'+$img+ '" /></div> ' +
                             '<div class="col-xs-10 col-sm-10"> ' +
                             '<div class="card-block"> ' +
