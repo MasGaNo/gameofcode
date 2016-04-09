@@ -17,8 +17,6 @@ app.get('/', function (req, res) {
 app.post('/trafficPlanner', function (req, res) {
     var uid = req.body.uid, position = req.body.position;
     if (isNullOrUndefined(uid) || isNullOrUndefined(position)) {
-        res.status();
-        res.send();
     }
 });
 app.listen(3000, function () {

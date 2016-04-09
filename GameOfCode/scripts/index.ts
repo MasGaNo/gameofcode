@@ -1,4 +1,6 @@
-﻿// For an introduction to the Blank template, see the following documentation:
+﻿/// <reference path="application.ts" />
+
+// For an introduction to the Blank template, see the following documentation:
 // http://go.microsoft.com/fwlink/?LinkID=397705
 // To debug code on page load in Ripple or on Android devices/emulators: launch your app, set breakpoints, 
 // and then run "window.location.reload()" in the JavaScript Console.
@@ -16,9 +18,8 @@ module GameOfCode {
             document.addEventListener('resume', onResume, false);
 
             // TODO: Cordova has been loaded. Perform any initialization that requires Cordova here.
-            var element = document.getElementById("deviceready");
-            element.innerHTML = 'Device Ready';
-            element.className += ' ready';
+
+            GameOfCode.Application.start();
         }
 
         function onPause() {

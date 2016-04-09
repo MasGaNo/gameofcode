@@ -17,12 +17,12 @@ app.get('/', function (req, res) {
     res.send('Hello World!');
 });
 
-app.post('/trafficPlanner', function(req, res) {
+app.post('/trafficPlanner', function (req, res: express.Response) {
     var uid = req.body.uid,
         position = req.body.position;
     if (isNullOrUndefined(uid) || isNullOrUndefined(position)) {
-        res.status();
-        res.send();
+        //res.status();
+        //res.send();
     }
 
 });
