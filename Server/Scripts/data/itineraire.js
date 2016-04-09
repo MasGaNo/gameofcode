@@ -38,6 +38,12 @@ function populatePositionsWithWaypoints(waypoints, uid, time) {
         return waypoint.position.to.lat + "_" + waypoint.position.to.lng;
     }).join('__');
     if (isInclude(Positions, itineraireHash) !== false) {
+        var currentUser = Positions[itineraireHash].filter(function (userPoint) {
+            return userPoint.uid === uid;
+        });
+        for (var i = currentUser.length - 1; i >= 0; --i) {
+            Positions[itineraireHash].splice(Positions[itineraireHash].indexOf(currentUser[i], 1));
+        }
         return false;
     }
     else {
@@ -75,6 +81,7 @@ function directionApi(params, options) {
                 if (data.status === 'ZERO_RESULTS') {
                     return resolve({ status: 'empty' });
                 }
+                var bestRoute = null;
                 for (var i = 0, max = data.routes.length; i < max; ++i) {
                     var steps = formatSteps(data.routes[i].legs[0].steps);
                     if (isNullOrUndefined(steps)) {
@@ -83,19 +90,23 @@ function directionApi(params, options) {
                         });
                     }
                     var dontNeedToRecalculate = populatePositionsWithWaypoints(steps, options.uid, params.departure_time);
+                    var currentRoute = {
+                        infos: {
+                            bounds: data.routes[i].bounds,
+                            distance: data.routes[i].legs[0].distance.value,
+                            duration: data.routes[i].legs[0].duration.value
+                        },
+                        steps: steps
+                    };
                     if (dontNeedToRecalculate === true) {
-                        return resolve({
-                            infos: {
-                                bounds: data.routes[i].bounds,
-                                distance: data.routes[i].legs[0].distance.value,
-                                duration: data.routes[i].legs[0].duration.value
-                            },
-                            steps: steps
-                        });
+                        return resolve(currentRoute);
+                    }
+                    if (!bestRoute || bestRoute.infos.duration > currentRoute.infos.duration) {
+                        bestRoute = currentRoute;
                     }
                 }
                 if (options.isAlternatives) {
-                    return resolve(steps);
+                    return resolve(bestRoute);
                 }
                 params.alternatives = true;
                 options.isAlternatives = true;

@@ -24,5 +24,4 @@ app.get('/addressSuggest', routeDataMapdata.addressToGeoloc);
 
 app.listen(3000, function () {
     console.log('The Mobiliteit Server is running.');
-
 });

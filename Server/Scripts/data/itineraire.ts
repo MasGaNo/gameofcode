@@ -168,6 +168,12 @@ function populatePositionsWithWaypoints(waypoints: IRealStep[], uid, time) {
     }).join('__');
 
     if (isInclude(Positions, itineraireHash) !== false) {
+        let currentUser = Positions[itineraireHash].filter((userPoint) => {
+            return userPoint.uid === uid;
+        });
+        for (let i = currentUser.length - 1; i >= 0; --i) {
+            Positions[itineraireHash].splice(Positions[itineraireHash].indexOf(currentUser[i], 1));
+        }
         return false;
     } else {
         Positions[itineraireHash] = [{
@@ -210,6 +216,8 @@ function directionApi(params: IGoogleDirectionParams, options: IDirectionApiOpti
                     return resolve({ status: 'empty' });
                 }
 
+                let bestRoute: IRealRoute = null;
+
                 for (var i = 0, max = data.routes.length; i < max; ++i) {
                     var steps = formatSteps(data.routes[i].legs[0].steps);
 
@@ -221,20 +229,25 @@ function directionApi(params: IGoogleDirectionParams, options: IDirectionApiOpti
 
                     var dontNeedToRecalculate = populatePositionsWithWaypoints(steps, options.uid, params.departure_time);
 
+                    let currentRoute: IRealRoute = {
+                        infos: {
+                            bounds: data.routes[i].bounds,
+                            distance: data.routes[i].legs[0].distance.value,
+                            duration: data.routes[i].legs[0].duration.value
+                        },
+                        steps: steps
+                    };
+
                     if (dontNeedToRecalculate === true) {
-                        return resolve(<IRealRoute>{
-                            infos: {
-                                bounds: data.routes[i].bounds,
-                                distance: data.routes[i].legs[0].distance.value,
-                                duration: data.routes[i].legs[0].duration.value
-                            },
-                            steps: steps
-                        });
+                        return resolve(currentRoute);
+                    }
+                    if (!bestRoute || bestRoute.infos.duration > currentRoute.infos.duration) { //add preference duration/distance
+                        bestRoute = currentRoute
                     }
                 }
 
                 if (options.isAlternatives) {
-                    return resolve(steps);
+                    return resolve(bestRoute);
                 }
 
                 params.alternatives = true;
