@@ -113,6 +113,24 @@ declare module GameOfCode {
             }
         }
 
+        interface IRealQueryDirection {
+            uid: string;
+            position: {
+                from: IPosition;
+                to: IPosition;
+            }
+            modes: string[];
+            options: string[];
+        }
+
+        interface IRealResponse {
+            headers: {
+                status: string;
+                code: number;
+            };
+            result: any;
+        }
+
     }
 
 
