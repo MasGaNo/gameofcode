@@ -16,6 +16,11 @@ var publicConfig = {
 };
 var gmAPI = new GoogleMapsAPI(publicConfig);
 
+interface IPosition {
+    lat: number;
+    lng: number;
+}
+
 interface IGoogleWaypoints {
     geocoder_status: string;//'OK',
     partial_match: boolean;// true,
@@ -28,6 +33,36 @@ interface IGoogleResponse {
     routes: any[];
     status: string;
 }
+
+interface IGoogleStep {
+    "distance": {
+        "text": string;//"89 m",
+        "value": number;//89
+    };
+    "duration": {
+        "text": string;//"1 min",
+        "value": number;//10
+    };
+    "end_location": IPosition;
+    "html_instructions": string;//"Head <b>south</b> on <b>Rue des Abanis</b> toward <b>Rue de Longwy</b>",
+    "polyline": {
+        "points": string;//"_gcmHygcb@FBBBDB`BxAHJHJ"
+    };
+    "start_location": IPosition;
+    "travel_mode": string;//"DRIVING"
+}
+
+interface IRealStep {
+    distance: number;//m
+    duration: number;//seconds
+    position: {
+        from: IPosition;
+        to: IPosition;
+    };
+    description: string;
+    mode: string;
+}
+
 
 interface IUserPoint {
     uid: string;
@@ -53,10 +88,10 @@ function isInclude(collection, key) {
     return collection[key] || false
 }
 
-function populatePositionsWithWaypoints(waypoints, uid, time) {
+function populatePositionsWithWaypoints(waypoints: IRealStep[], uid, time) {
     var result: any = true;
     _(waypoints.reverse()).each(function (waypoint) {
-        var positionKey = `${waypoint.end_location.lat}_${waypoint.end_location.lng}`;
+        var positionKey = `${waypoint.position.to.lat}_${waypoint.position.to.lng}`;
 
         if (isInclude(Positions, positionKey) !== false) {
             result = positionKey;
@@ -67,8 +102,24 @@ function populatePositionsWithWaypoints(waypoints, uid, time) {
                 time: time
             }];
         }
-    })
+    });
+    waypoints.reverse();
     return result;
+}
+
+function formatSteps(steps: IGoogleStep[]): IRealStep[] {
+    return steps.map((step) => {
+        return <IRealStep>{
+            description: step.html_instructions,
+            distance: step.distance.value,
+            duration: step.duration.value,
+            mode: step.travel_mode,
+            position: {
+                from: step.start_location,
+                to: step.end_location
+            }
+        };
+    });
 }
 
 function directionApi(params: IGoogleParams, uid: string) {
@@ -87,7 +138,7 @@ function directionApi(params: IGoogleParams, uid: string) {
                     return resolve({ status: 'empty' });
                 }
 
-                var steps = data.routes[0].legs[0].steps;
+                var steps = formatSteps(data.routes[0].legs[0].steps);
 
                 if (isNullOrUndefined(steps)) {
                     return reject({
@@ -96,7 +147,6 @@ function directionApi(params: IGoogleParams, uid: string) {
                 }
                 var dontNeedToRecalculate = populatePositionsWithWaypoints(steps, uid, params.departure_time)
 
-                console.log(dontNeedToRecalculate);
                 if (dontNeedToRecalculate !== true && false) {
                     params.alternatives = true;
                     return directionApi(params, uid).then(resolve, reject);
