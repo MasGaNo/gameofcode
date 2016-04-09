@@ -41,6 +41,7 @@
     <TypeScriptCompile Include="Scripts\typings\express-serve-static-core\express-serve-static-core.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\express\express.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\form-data\form-data.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\gameofcode\gameofcode.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\googlemaps\googlemaps.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\lodash\lodash.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\mime\mime.d.ts" />
@@ -63,6 +64,7 @@
     <Folder Include="Scripts\typings\googlemaps\" />
     <Folder Include="Scripts\typings\lodash\" />
     <Folder Include="Scripts\typings\mime\" />
+    <Folder Include="Scripts\typings\gameofcode\" />
     <Folder Include="Scripts\typings\node\" />
     <Folder Include="Scripts\typings\request\" />
     <Folder Include="Scripts\typings\serve-static\" />

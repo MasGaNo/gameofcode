@@ -12,10 +12,11 @@ module GameOfCode {
     export module AdvSearch {
 
         export function start() {
+
             $.get(Configuration.Server.url + '/addressSuggest', {
                 dataType: 'json'
             }).then((data) => {
-                    console.log(JSON.parse(data));
+                    console.log(data);
                 }).fail((error) => {
                     console.log(error);
                 });

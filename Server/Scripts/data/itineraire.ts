@@ -1,4 +1,6 @@
 ﻿/// <reference path="../typings/googlemaps/googlemaps.d.ts" />
+/// <reference path="../typings/gameofcode/gameofcode.d.ts" />
+
 var GoogleMapsAPI = require('googlemaps');
 
 /// <reference path="Scripts/typings/lodash/lodash.d.ts"/>
@@ -16,68 +18,8 @@ var publicConfig = {
 };
 var gmAPI = new GoogleMapsAPI(publicConfig);
 
-interface IPosition {
-    lat: number;
-    lng: number;
-}
 
-interface IGoogleWaypoints {
-    geocoder_status: string;//'OK',
-    partial_match: boolean;// true,
-    place_id: string;//'ChIJ0X0Wi4hubIcRQTQt_4vqs1U',
-    types: any;
-}
-
-interface IGoogleResponse {
-    geocoded_waypoints: IGoogleWaypoints[];
-    routes: any[];
-    status: string;
-}
-
-interface IGoogleStep {
-    "distance": {
-        "text": string;//"89 m",
-        "value": number;//89
-    };
-    "duration": {
-        "text": string;//"1 min",
-        "value": number;//10
-    };
-    "end_location": IPosition;
-    "html_instructions": string;//"Head <b>south</b> on <b>Rue des Abanis</b> toward <b>Rue de Longwy</b>",
-    "polyline": {
-        "points": string;//"_gcmHygcb@FBBBDB`BxAHJHJ"
-    };
-    "start_location": IPosition;
-    "travel_mode": string;//"DRIVING"
-}
-
-interface IRealStep {
-    distance: number;//m
-    duration: number;//seconds
-    position: {
-        from: IPosition;
-        to: IPosition;
-    };
-    description: string;
-    mode: string;
-}
-
-
-interface IUserPoint {
-    uid: string;
-    time: Date;
-}
-
-interface IGoogleParams {
-    origin: string;
-    destination: string;
-    mode: string;
-    departure_time: number;
-    alternatives?: boolean;
-}
-
-var Positions: { [coordonate: string]: IUserPoint[] } = {};
+var Positions: { [coordonate: string]: GameOfCode.IUserPoint[] } = { };
 
 
 function isNullOrUndefined(value) {
@@ -88,10 +30,10 @@ function isInclude(collection, key) {
     return collection[key] || false
 }
 
-function populatePositionsWithWaypoints(waypoints: IRealStep[], uid, time) {
+function populatePositionsWithWaypoints(waypoints: GameOfCode.RealApi.IRealStep[], uid, time) {
     var result: any = true;
-    _(waypoints.reverse()).each(function (waypoint) {
-        var positionKey = `${waypoint.position.to.lat}_${waypoint.position.to.lng}`;
+    /*_(waypoints).each(function (waypoint, index) {
+        var positionKey = `${waypoint.position.from.lng}_${waypoint.position.from.lat}__${waypoint.position.to.lat}_${waypoint.position.to.lng}`;
 
         if (isInclude(Positions, positionKey) !== false) {
             result = positionKey;
@@ -102,14 +44,35 @@ function populatePositionsWithWaypoints(waypoints: IRealStep[], uid, time) {
                 time: time
             }];
         }
-    });
-    waypoints.reverse();
+    });*/
+    let itineraireHash = waypoints.map((waypoint, index) => {
+        if (!index) {
+            return `${waypoint.position.from.lng}_${waypoint.position.from.lat}__${waypoint.position.to.lat}_${waypoint.position.to.lng}`;
+        }
+        return `${waypoint.position.to.lat}_${waypoint.position.to.lng}`;
+    }).join('__');
+
+    if (isInclude(Positions, itineraireHash) !== false) {
+        let currentUser = Positions[itineraireHash].filter((userPoint) => {
+            return userPoint.uid === uid;
+        });
+        for (let i = currentUser.length - 1; i >= 0; --i) {
+            Positions[itineraireHash].splice(Positions[itineraireHash].indexOf(currentUser[i], 1));
+        }
+        return false;
+    } else {
+        Positions[itineraireHash] = [{
+            uid: uid,
+            time: time
+        }];
+    }
+
     return result;
 }
 
-function formatSteps(steps: IGoogleStep[]): IRealStep[] {
+function formatSteps(steps: GameOfCode.GoogleApi.IGoogleStep[]): GameOfCode.RealApi.IRealStep[] {
     return steps.map((step) => {
-        return <IRealStep>{
+        return <GameOfCode.RealApi.IRealStep>{
             description: step.html_instructions,
             distance: step.distance.value,
             duration: step.duration.value,
@@ -122,11 +85,11 @@ function formatSteps(steps: IGoogleStep[]): IRealStep[] {
     });
 }
 
-function directionApi(params: IGoogleParams, uid: string) {
+function directionApi(params: GameOfCode.GoogleApi.IGoogleDirectionParams, options: GameOfCode.IDirectionApiOptions) {
 
     return new Promise((resolve, reject) => {
 
-        gmAPI.directions(params, function (err, data: IGoogleResponse) {
+        gmAPI.directions(params, function (err, data: GameOfCode.GoogleApi.IGoogleResponse) {
             if (err) {
                 return reject({
                     message: 'Error while we try to contact Directions Server.',
@@ -138,21 +101,43 @@ function directionApi(params: IGoogleParams, uid: string) {
                     return resolve({ status: 'empty' });
                 }
 
-                var steps = formatSteps(data.routes[0].legs[0].steps);
+                let bestRoute: GameOfCode.RealApi.IRealRoute = null;
 
-                if (isNullOrUndefined(steps)) {
-                    return reject({
-                        message: "No route found for this trajet."
-                    });
+                for (var i = 0, max = data.routes.length; i < max; ++i) {
+                    var steps = formatSteps(data.routes[i].legs[0].steps);
+
+                    if (isNullOrUndefined(steps)) {
+                        return reject({
+                            message: "No route found for this trajet."
+                        });
+                    }
+
+                    var dontNeedToRecalculate = populatePositionsWithWaypoints(steps, options.uid, params.departure_time);
+
+                    let currentRoute: GameOfCode.RealApi.IRealRoute = {
+                        infos: {
+                            bounds: data.routes[i].bounds,
+                            distance: data.routes[i].legs[0].distance.value,
+                            duration: data.routes[i].legs[0].duration.value
+                        },
+                        steps: steps
+                    };
+
+                    if (dontNeedToRecalculate === true) {
+                        return resolve(currentRoute);
+                    }
+                    if (!bestRoute || bestRoute.infos.duration > currentRoute.infos.duration) { //add preference duration/distance
+                        bestRoute = currentRoute
+                    }
                 }
-                var dontNeedToRecalculate = populatePositionsWithWaypoints(steps, uid, params.departure_time)
 
-                if (dontNeedToRecalculate !== true && false) {
-                    params.alternatives = true;
-                    return directionApi(params, uid).then(resolve, reject);
+                if (options.isAlternatives) {
+                    return resolve(bestRoute);
                 }
 
-                resolve(steps);
+                params.alternatives = true;
+                options.isAlternatives = true;
+                directionApi(params, options).then(resolve, reject);
             }
         })
     });
@@ -170,14 +155,14 @@ export function getBestItineraire(req, res: Express.Response) {
     }
 
     // Call Google Api
-    var params: IGoogleParams = {
+    var params: GameOfCode.GoogleApi.IGoogleDirectionParams = {
         origin: `${position.from.lng},${position.from.lat}`,
         destination: `${position.to.lng},${position.to.lat}`,
         mode: 'driving',
         departure_time: Date.now()
     };
 
-    directionApi(params, uid).then((steps) => {
+    directionApi(params, { uid: uid, isAlternatives: false }).then((steps) => {
         res.send(steps);
     }).catch((error) => {
         console.log(error);

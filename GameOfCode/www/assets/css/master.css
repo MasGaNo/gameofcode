@@ -1,7 +1,9 @@
-
+body{
+    background-color: #F6F5F5!important
+}
 
 #main {
-    height: 400px;
+    height: 500px;
     display: -webkit-flex; /* Safari */
     -webkit-align-items: center; /* Safari 7.0+ */
     display: flex;
@@ -14,4 +16,15 @@ i,p.advanceSearch,label{
 
 .imgSearch{
     width: 20px!important;
+}
+
+p > img{
+    max-width: 240px!important;
+}
+
+#searcharea{
+    border: solid 1px #C0C0C0;
+    background-color: white;
+    padding: 29px 20px 17px 20px;
+    border-radius: 5px;
 }
