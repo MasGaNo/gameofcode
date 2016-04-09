@@ -70,20 +70,19 @@ $(document).ready(function(){
         e.preventDefault();
 
         var $form = $(e.currentTarget);
-        var data = {};
-        $form.find('input').each((index, input) => {
+        var data = {position:{}};
+        $form.find('input[name=from], input[name=to]').each((index, input) => {
             var $input = $(input);
-            data[$input.attr('name')] = {
+            data['position'][$input.attr('name')] = {
                 lng: $input.data('lng'),
                 lat: $input.data('lat')
             };
         });
 
         var serializeData = $form.serializeArray();
-        $to =  Object.keys(data.to).map(function(_) { return data.to[_]; });
 
-        data.from['lat'] = data.from['lat'] || '49.600508';
-        data.from['lng'] = data.from['lng'] || '6.113629';
+        data.position.from['lat'] = data.position.from['lat'] || '49.600508';
+        data.position.from['lng'] = data.position.from['lng'] || '6.113629';
 
         data.uid = 'j3h4jk23b';
 
