@@ -102,11 +102,65 @@ $(document).ready(function(){
         $.ajax({
             type: "POST",
             url: localUrl,
-            data: data
+            data: data,
+            success: function(data){
+                var $response=$(data);
+
+                if(data.steps.length>0)
+                {
+                    var num = data.steps.length;
+                    for(var i = 1; i <= num; i++) {
+                        var $mode=data.steps[i]['mode'];
+                        var $distance=data.steps[i]['distance'];
+                        $duration=data.steps[i]['duration'];
+
+                        $img="assets/img/map.png";
+                        if($mode=="DRIVING")
+                        {
+                            $img="assets/img/car.png";
+                        }else if ($mode=="BUS")
+                        {
+                            $img="assets/img/bus.png";
+                        }else if($mode=="TRAIN")
+                        {
+                            $img="assets/img/train.png";
+                        }
+                        else if($mode=="BIKE")
+                        {
+                            $img="assets/img/bike.png";
+                        }
+                        else if ($mode=="WALK")
+                        {
+                            $img="assets/img/walk.png";
+                        }
+                        var $desc=data.steps[i]['description'];
+                        var $cart='<br><div class="clearfix"></div><div class="row-fluid">' +
+                            '<div class="col-md-3 col-xs-3 col-sm-3"><img class="lock-img" src="'+$img+ '" /></div> ' +
+                            '<div class="col-md-9 col-xs-3 col-sm-9"> ' +
+                            '<div class="card-block"> ' +
+                            '<div class="text-muted">Description</div> <p class="card-text">'+$desc+'</p> ' +
+                            '<ul class="list-inline text-muted"> ' +
+                            '<li class="list-inline-item"><i class="fa fa-flag"></i> '+$distance+'m</li> ' +
+                            '<li class="list-inline-item"><i class="fa fa-clock-o"></i> '+$duration+'s</li> ' +
+                            '</ul> ' +
+                            '</div></div> ' +
+                            '</div> ' +
+                            '';
+
+                        $('#pagetwo').append($cart).hide().show('slow');
+                    }
+
+                }
+
+            }
         });
 
         $('#pagetwo').show();
         $('#pageone').hide();
+
+
+
+
     });
 });
 

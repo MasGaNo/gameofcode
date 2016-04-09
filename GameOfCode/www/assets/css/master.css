@@ -37,3 +37,7 @@ p > img{
     display: flex;
     align-items: center;
 }
+
+.lock-img{
+    width: 25px !important;;
+}
