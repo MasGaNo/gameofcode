@@ -36,6 +36,15 @@
     background-color: #4B946A;
 }
 
+.loader {
+    display: none;
+    height: 8px;
+    width: 100%;
+}
+    .loader.active {
+        display: block;
+    }
+
 @keyframes fade {
     from { opacity: 1.0; }
     50% { opacity: 0.4; }

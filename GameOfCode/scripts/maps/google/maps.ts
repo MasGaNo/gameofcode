@@ -8,6 +8,10 @@
 
                 export function init(callback?: () => void) {
 
+                    if (!(window as any).plugin || !(window as any).plugin.google || !(window as any).plugin.google.maps) {
+                        return;
+                    }
+                    
                     (window as any).plugin.google.maps.Map.isAvailable(function (isAvailable, message) {
                         if (isAvailable) {
                             let mapDiv = document.getElementById('map_canvas');
@@ -30,11 +34,15 @@
                 }
 
                 export function show() {
-                    mapInstance.showDialog();
+                    if (mapInstance) {
+                        mapInstance.showDialog();
+                    }
                 }
 
                 export function hide() {
-                    mapInstance.closeDialog();
+                    if (mapInstance) {
+                        mapInstance.closeDialog();
+                    }
                 }
 
             }

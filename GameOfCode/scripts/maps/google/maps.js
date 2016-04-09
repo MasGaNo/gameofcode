@@ -8,6 +8,9 @@ var GameOfCode;
             (function (Maps) {
                 var mapInstance = null;
                 function init(callback) {
+                    if (!window.plugin || !window.plugin.google || !window.plugin.google.maps) {
+                        return;
+                    }
                     window.plugin.google.maps.Map.isAvailable(function (isAvailable, message) {
                         if (isAvailable) {
                             var mapDiv = document.getElementById('map_canvas');
@@ -29,11 +32,15 @@ var GameOfCode;
                 }
                 Maps.init = init;
                 function show() {
-                    mapInstance.showDialog();
+                    if (mapInstance) {
+                        mapInstance.showDialog();
+                    }
                 }
                 Maps.show = show;
                 function hide() {
-                    mapInstance.closeDialog();
+                    if (mapInstance) {
+                        mapInstance.closeDialog();
+                    }
                 }
                 Maps.hide = hide;
             })(Maps = Google.Maps || (Google.Maps = {}));
