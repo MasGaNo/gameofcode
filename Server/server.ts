@@ -15,7 +15,18 @@ interface UserPoint {
 
 var Positions:{[coordonate:string]: UserPoint[]} = {};
 
+
+import routeDataMapdata = require('./Scripts/data/mapdata');
+
+
 var app = express();
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -53,7 +64,7 @@ function populatePositionsWithWaypoints(waypoints, uid, time) {
     return result;
 }
 
-app.post('/trafficPlanner', function(req, res) {
+app.post('/trafficPlanner', function (req, res: express.Response) {
     var uid = req.body.uid,
         position = req.body.position;
 
@@ -92,6 +103,8 @@ app.post('/trafficPlanner', function(req, res) {
     })
 
 });
+
+app.get('/addressSuggest', routeDataMapdata.addressToGeoloc);
 
 app.listen(3000, function () {
     console.log('The Mobiliteit Server is running.');
