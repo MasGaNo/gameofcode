@@ -116,6 +116,7 @@ $(document).ready(function(){
         }).complete((data) => {
 
         }).fail((data) => {
+            console.error(data);``
             alert('Error... please try again later...');
         }).always(() => {
             $button.prop('disabled', false);
