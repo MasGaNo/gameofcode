@@ -12,6 +12,7 @@
     "express": "^4.13.4",
     "express-async-wrap": "^1.0.0",
     "googlemaps": "^1.4.0",
-    "lodash": "^4.9.0"
+    "lodash": "^4.9.0",
+    "request": "2.70.0"
   }
 }
