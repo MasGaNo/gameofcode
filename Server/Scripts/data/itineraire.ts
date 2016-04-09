@@ -77,6 +77,11 @@ interface IGoogleParams {
     alternatives?: boolean;
 }
 
+interface IDirectionApiOptions {
+    uid: string;
+    isAlternatives: boolean;
+}
+
 var Positions: { [coordonate: string]: IUserPoint[] } = {};
 
 
@@ -90,8 +95,8 @@ function isInclude(collection, key) {
 
 function populatePositionsWithWaypoints(waypoints: IRealStep[], uid, time) {
     var result: any = true;
-    _(waypoints.reverse()).each(function (waypoint) {
-        var positionKey = `${waypoint.position.to.lat}_${waypoint.position.to.lng}`;
+    _(waypoints).each(function (waypoint, index) {
+        var positionKey = `${waypoint.position.from.lng}_${waypoint.position.from.lat}__${waypoint.position.to.lat}_${waypoint.position.to.lng}`;
 
         if (isInclude(Positions, positionKey) !== false) {
             result = positionKey;
@@ -103,7 +108,6 @@ function populatePositionsWithWaypoints(waypoints: IRealStep[], uid, time) {
             }];
         }
     });
-    waypoints.reverse();
     return result;
 }
 
@@ -122,7 +126,7 @@ function formatSteps(steps: IGoogleStep[]): IRealStep[] {
     });
 }
 
-function directionApi(params: IGoogleParams, uid: string) {
+function directionApi(params: IGoogleParams, options: IDirectionApiOptions) {
 
     return new Promise((resolve, reject) => {
 
@@ -133,6 +137,8 @@ function directionApi(params: IGoogleParams, uid: string) {
                     error: err.toString()
                 });
             } else {
+
+                console.log(data);
 
                 if (data.status === 'ZERO_RESULTS') {
                     return resolve({ status: 'empty' });
@@ -145,11 +151,19 @@ function directionApi(params: IGoogleParams, uid: string) {
                         message: "No route found for this trajet."
                     });
                 }
-                var dontNeedToRecalculate = populatePositionsWithWaypoints(steps, uid, params.departure_time)
 
-                if (dontNeedToRecalculate !== true && false) {
+                console.log(steps);
+                var dontNeedToRecalculate = populatePositionsWithWaypoints(steps, options.uid, params.departure_time)
+
+                if (dontNeedToRecalculate !== true) {
+
+                    if (options.isAlternatives) {
+                        return resolve(steps);
+                    }
+
                     params.alternatives = true;
-                    return directionApi(params, uid).then(resolve, reject);
+                    options.isAlternatives = true;
+                    return directionApi(params, options).then(resolve, reject);
                 }
 
                 resolve(steps);
@@ -177,7 +191,7 @@ export function getBestItineraire(req, res: Express.Response) {
         departure_time: Date.now()
     };
 
-    directionApi(params, uid).then((steps) => {
+    directionApi(params, { uid: uid, isAlternatives: false }).then((steps) => {
         res.send(steps);
     }).catch((error) => {
         console.log(error);
