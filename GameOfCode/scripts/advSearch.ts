@@ -12,6 +12,7 @@ module GameOfCode {
     export module AdvSearch {
 
         export function start() {
+
             $.get(Configuration.Server.url + '/addressSuggest', {
                 dataType: 'json'
             }).then((data) => {
