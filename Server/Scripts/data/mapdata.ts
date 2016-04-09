@@ -8,7 +8,7 @@ import Express = require('express');
 import request = require('request');
 
 var options = {
-    url: 'https://maps.googleapis.com/maps/api/geocode/json?address=Winnetka&key=AIzaSyDE5v5BvgE7zpYBHlH5g9_HlqAPgXXsHpQs',
+    url: 'https://maps.googleapis.com/maps/api/geocode/json?address=Winnetka&key=THE_API_KEY',
     port: 80,
     method: 'GET'
 };
