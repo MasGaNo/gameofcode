@@ -1,3 +1,4 @@
+"use strict";
 /// <reference path="Scripts/typings/express/express.d.ts"/>
 var express = require('express');
 /// <reference path="Scripts/typings/body-parser/body-parser.d.ts"/>

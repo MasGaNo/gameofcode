@@ -1,5 +1,6 @@
 /// <reference path="../../typings/googlemaps/googlemaps.d.ts" />
 /// <reference path="../../typings/gameofcode/gameofcode.d.ts" />
+"use strict";
 var GoogleMapsAPI = require('googlemaps');
 /// <reference path="Scripts/typings/lodash/lodash.d.ts"/>
 var _ = require('lodash');
