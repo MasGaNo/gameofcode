@@ -8,11 +8,15 @@ var GameOfCode;
     "use strict";
     var Application;
     (function (Application) {
+        var loadId = -1;
         function initialize() {
             document.addEventListener('deviceready', onDeviceReady, false);
+            loadId = setTimeout(onDeviceReady, 2000);
         }
         Application.initialize = initialize;
         function onDeviceReady() {
+            clearTimeout(loadId);
+            loadId = -1;
             // Handle the Cordova pause and resume events
             document.addEventListener('pause', onPause, false);
             document.addEventListener('resume', onResume, false);

@@ -1,4 +1,7 @@
-﻿module GameOfCode {
+﻿/// <reference path="./advSearch.ts"/>
+
+
+module GameOfCode {
     "use strict";
 
     export module Application {
@@ -12,9 +15,11 @@
                 console.error(error);
                 });
                 */
-            let mapDiv = document.getElementById('map_canvas');
+            /*let mapDiv = document.getElementById('map_canvas');
             let map = (window as any).plugin.google.maps.Map.getMap(mapDiv);
             map.on((window as any).plugin.google.maps.event.MAP_READY, onMapInit);
+*/
+            GameOfCode.AdvSearch.start();
         }
 
         function onMapInit(map) {

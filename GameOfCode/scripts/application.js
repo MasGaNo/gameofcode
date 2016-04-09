@@ -1,3 +1,4 @@
+/// <reference path="./advSearch.ts"/>
 var GameOfCode;
 (function (GameOfCode) {
     "use strict";
@@ -11,9 +12,11 @@ var GameOfCode;
                 console.error(error);
                 });
                 */
-            var mapDiv = document.getElementById('map_canvas');
-            var map = window.plugin.google.maps.Map.getMap(mapDiv);
-            map.on(window.plugin.google.maps.event.MAP_READY, onMapInit);
+            /*let mapDiv = document.getElementById('map_canvas');
+            let map = (window as any).plugin.google.maps.Map.getMap(mapDiv);
+            map.on((window as any).plugin.google.maps.event.MAP_READY, onMapInit);
+*/
+            GameOfCode.AdvSearch.start();
         }
         Application.start = start;
         function onMapInit(map) {
