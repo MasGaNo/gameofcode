@@ -119,7 +119,7 @@ function directionApi(params: GameOfCode.GoogleApi.IGoogleDirectionParams, optio
                             bounds: data.routes[i].bounds,
                             distance: data.routes[i].legs[0].distance.value,
                             duration: data.routes[i].legs[0].duration.value
-                        },
+                        }, 
                         steps: steps
                     };
 

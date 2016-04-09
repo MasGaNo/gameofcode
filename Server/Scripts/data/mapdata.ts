@@ -22,7 +22,7 @@ export function addressToGeoloc(req:Express.Request, res:Express.Response) {
             res.send(body);
         }
     });
-
+     
     req.on('error', (e) => {
         console.log(`problem with request: ${e.message}`);
     });

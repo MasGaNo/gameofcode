@@ -155,7 +155,7 @@ $(document).ready(function(){
         $('#pagetwo').show();
         $('#pageone').hide();
     }).fail((data) => {
-            console.error(data);``
+            console.error(data);
         alert('Error... please try again later...');
     }).always(() => {
           $button.prop('disabled', false);

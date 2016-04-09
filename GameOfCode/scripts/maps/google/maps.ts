@@ -67,8 +67,7 @@
                           'color' : '#AA00FF',
                           'width': 8,
                           'geodesic': false
-                        });
-                    });
+                      });
                 }
 
             }
