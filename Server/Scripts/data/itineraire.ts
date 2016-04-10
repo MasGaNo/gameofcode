@@ -44,7 +44,7 @@ export function getBestItineraire(req: Express.Request, res: Express.Response) {
                 headers: {
                     code: 0,
                     status: 'ok'
-                },
+                }, 
                 result: result
             });
         }

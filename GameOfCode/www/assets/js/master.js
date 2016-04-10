@@ -94,14 +94,23 @@ $(document).ready(function(){
             url: localUrl,
             data: data
         }).success((data) => {
-            var $response=$(data);
-                if(data.steps.length>0)
+                if(data.result.steps.length>0)
                 {
-                    var num = data.steps.length;
+                    var num = data.result.steps.length;
+
+                    var polygineList = [];
+
                     for(var i = 0; i < num; i++) {
-                        var $mode=data.steps[i]['mode'];
-                        var $distance=data.steps[i]['distance'];
-                        $duration=data.steps[i]['duration'];
+
+                      if (i === 0) {
+                        polygineList.push(data.result.steps[i]['position']['from']);
+                      }
+
+                        var $mode=data.result.steps[i]['mode'];
+                        var $distance=data.result.steps[i]['distance'];
+                        $duration=data.result.steps[i]['duration'];
+                        polygineList.push(data.result.steps[i]['position']['to']);
+
                         $img="assets/img/map.png";
                         if($mode=="DRIVING")
                         {
@@ -121,7 +130,7 @@ $(document).ready(function(){
                         {
                             $img="assets/img/walk.png";
                         }
-                        var $desc=data.steps[i]['description'];
+                        var $desc=data.result.steps[i]['description'];
                         var $cart='<br></div><div class="row-fluid border-img">' +
                             '<div class="col-xs-2 col-sm-2"><img class="lock-img" src="'+$img+ '" /></div> ' +
                             '<div class="col-xs-10 col-sm-10"> ' +
@@ -134,11 +143,19 @@ $(document).ready(function(){
                             '</div></div> ';
                         $('#pagetwo').append($cart).hide().show('slow');
                     }
+
+                    $('#pagetwo button').off('click').on('click', function() {
+                      GameOfCode.Maps.Google.Maps.show();
+                      GameOfCode.Maps.Google.Maps.clearInfo();
+                        GameOfCode.Maps.Google.Maps.setItineraire(polygineList);
+                        GameOfCode.Maps.Google.Maps.centerCameraTo(polygineList[0]);
+
+                    });
                 }
         $('#pagetwo').show();
         $('#pageone').hide();
     }).fail((data) => {
-            console.error(data);``
+            console.error(data);
         alert('Error... please try again later...');
     }).always(() => {
           $button.prop('disabled', false);

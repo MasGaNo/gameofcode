@@ -73,6 +73,13 @@ var GameOfCode;
                     }
                 }
                 Maps.init = init;
+                function activeTraffic(active) {
+                    if (active === void 0) { active = true; }
+                    if (mapInstance) {
+                        mapInstance.setTrafficEnabled(active);
+                    }
+                }
+                Maps.activeTraffic = activeTraffic;
                 function show() {
                     if (mapInstance) {
                         mapInstance.showDialog();
@@ -85,6 +92,37 @@ var GameOfCode;
                     }
                 }
                 Maps.hide = hide;
+                function clearInfo() {
+                    if (mapInstance) {
+                        mapInstance.clear();
+                    }
+                }
+                Maps.clearInfo = clearInfo;
+                function setItineraire(listPoint) {
+                    mapInstance.addPolyline({
+                        points: listPoint.map(function (point) {
+                            return new window.plugin.google.maps.LatLng(point.lat, point.lng);
+                        }),
+                        'color': '#AA00FF',
+                        'width': 8,
+                        'geodesic': false
+                    });
+                }
+                Maps.setItineraire = setItineraire;
+                function centerCameraTo(point) {
+                    if (mapInstance) {
+                        var target = new window.plugin.google.maps.LatLng(point.lat, point.lng);
+                        mapInstance.animateCamera({
+                            'target': target,
+                            'tilt': 60,
+                            'zoom': 18,
+                            'bearing': 140,
+                            'duration': 5000 // = 5 sec.
+                        }, function () {
+                        });
+                    }
+                }
+                Maps.centerCameraTo = centerCameraTo;
             })(Maps = Google.Maps || (Google.Maps = {}));
         })(Google = Maps_1.Google || (Maps_1.Google = {}));
     })(Maps = GameOfCode.Maps || (GameOfCode.Maps = {}));
